@@ -48,10 +48,10 @@ options:
 
 ### Upload help
 ```bash
-usage: ena-upload upload [-h] runs_file username password
+usage: ena-upload upload [-h] template username password
 
 positional arguments:
-  runs_file   Configuration file
+  template    Filled in template file
   username    Webin username
   password    Webin password
 

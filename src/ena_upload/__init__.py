@@ -67,10 +67,26 @@ def upload_fastq_files(args):
         fastq_files.append(ws.cell(row=i, column=11).value)
         i += 1
 
-    url = "webin2.ebi.ac.uk"
-    ftp = FTP(url, args.username, args.password)
-    for fastq_file in tqdm(fastq_files):
-        ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
+    # url = "webin2.ebi.ac.uk"
+    # ftp = FTP(url, args.username, args.password)
+    # for fastq_file in tqdm(fastq_files):
+    #     ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
+
+
+    # save the first worksheet as a tsv
+    ws = wb['Samples']
+    with open('samples.tsv', 'w', newline='') as f:
+        c = csv.writer(f, delimiter='\t')
+        for r in ws.rows:
+            c.writerow([cell.value for cell in r])
+
+    # save the second worksheet as a tsv
+    ws = wb['Runs']
+    with open('runs.tsv', 'w', newline='') as f:
+        c = csv.writer(f, delimiter='\t')
+        for r in ws.rows:
+            c.writerow([cell.value for cell in r])    
+
 
 
 def disccover_files(args):
