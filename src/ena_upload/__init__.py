@@ -19,6 +19,7 @@ from fastq_files import SingleSample, PairedSample
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl import Workbook, worksheet, load_workbook
 from openpyxl.utils import quote_sheetname
+import logging
 
 __package_dir__ = os.path.dirname(os.path.abspath(__file__))
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -90,15 +91,19 @@ def upload_fastq_files(args):
 
 
 def disccover_files(args):
-    if args.mode=='SINGLE':
-        samples = ff.find_single_fastq_samples(",",args.regex1)
+    if args.mode.lower()=='single':
+        samples = ff.find_single_fastq_samples(".",args.regex1)
     else:
         samples = ff.find_paired_fastq_samples(".",args.regex1, args.regex2)
 
     for sample in samples:
         sample.calculate_md5()
 
-    write_template_files(samples)
+    if len(samples) == 0:
+        logging.error("No samples found")
+        sys.exit(1)
+
+    write_template_files(samples, args.mode)
 
 def load_config():
     config_file = os.path.join(__package_dir__, "config.toml")
@@ -182,8 +187,9 @@ def write_template_files(samples: List[Union[SingleSample,PairedSample]], mode: 
         ws2.append(["sample","study","instrument_model","library_name","library_source","library_selection","library_strategy","library_layout","file_name","file_md5"])
 
         for sample in samples:
+            print(sample)
             ws2.append([sample.prefix,'','',sample.prefix,'','','','SINGLE',os.path.split(sample.r1[0])[-1],sample.md5r1[0]])
-            
+
     dv3 = DataValidation(type="list", formula1=validator_formulas['instrument_model'], allow_blank=False, showErrorMessage=True)
     dv3.error ='Your entry is not in the list'
     dv3.errorTitle = 'Invalid Entry'
