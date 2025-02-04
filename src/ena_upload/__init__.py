@@ -9,13 +9,12 @@ __version__ = "0.1.0"
 import sys
 import csv
 import argparse
-import subprocess
 import os
 import toml
 from ftplib import FTP
 from tqdm import tqdm
 import fastq_files as ff
-from typing import List
+from typing import List, Union
 from fastq_files import SingleSample, PairedSample
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl import Workbook, worksheet
@@ -101,7 +100,7 @@ def get_validator_formulas():
     return formulas
 
 
-def write_template_files(samples: List[SingleSample|PairedSample]):
+def write_template_files(samples: List[Union[SingleSample|PairedSample]]):
     config = load_config()
 
     # Create a workbook and add a worksheet.
