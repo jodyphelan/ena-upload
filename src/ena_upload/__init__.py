@@ -38,7 +38,7 @@ def cli():
 
     # create the parser for the "upload" command
     parser_upload = subparsers.add_parser('upload', help='Upload fastq files to ENA')
-    parser_upload.add_argument('template', help='Configuration file')
+    parser_upload.add_argument('template', help='Filled in configuration file')
     parser_upload.add_argument('username', help='Webin username')
     parser_upload.add_argument('password', help='Webin password')
     parser_upload.set_defaults(func=upload_fastq_files)
