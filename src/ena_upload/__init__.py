@@ -17,7 +17,7 @@ import fastq_files as ff
 from typing import List, Union
 from fastq_files import SingleSample, PairedSample
 from openpyxl.worksheet.datavalidation import DataValidation
-from openpyxl import Workbook, worksheet
+from openpyxl import Workbook, worksheet, load_workbook
 from openpyxl.utils import quote_sheetname
 
 __package_dir__ = os.path.dirname(os.path.abspath(__file__))
@@ -38,9 +38,9 @@ def cli():
 
     # create the parser for the "upload" command
     parser_upload = subparsers.add_parser('upload', help='Upload fastq files to ENA')
-    parser_upload.add_argument('runs_file', help='Configuration file')
-    parser_upload.add_argument('username', help='ENA username')
-    parser_upload.add_argument('password', help='ENA password')
+    parser_upload.add_argument('template', help='Configuration file')
+    parser_upload.add_argument('username', help='Webin username')
+    parser_upload.add_argument('password', help='Webin password')
     parser_upload.set_defaults(func=upload_fastq_files)
 
 
@@ -53,17 +53,24 @@ def cli():
 
 
 def upload_fastq_files(args):
+    wb = load_workbook(args.template)
+
     fastq_files = []
-    FH = open(args.runs_file)
-    FH.readline()
-    for row in csv.DictReader(FH, delimiter="\t"):
-        fastq_files.append(row["forward_file_name"])
-        fastq_files.append(row["reverse_file_name"])
-    
-    url = "webin2.ebi.ac.uk"
-    ftp = FTP(url, args.username, args.password)
-    for fastq_file in tqdm(fastq_files):
-        ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
+
+    # select "Runs" worksheet
+    ws = wb['Runs']
+    i = 3
+    while True:
+        if ws.cell(row=i, column=9).value is None:
+            break
+        fastq_files.append(ws.cell(row=i, column=9).value)
+        fastq_files.append(ws.cell(row=i, column=11).value)
+
+    print(fastq_files)
+    # url = "webin2.ebi.ac.uk"
+    # ftp = FTP(url, args.username, args.password)
+    # for fastq_file in tqdm(fastq_files):
+    #     ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
 
 
 def disccover_files(args):
