@@ -53,7 +53,9 @@ def cli():
 
 def upload_fastq_files(args):
     fastq_files = []
-    for row in csv.DictReader(open(args.runs_file), delimiter="\t"):
+    FH = open(args.runs_file)
+    FH.readline()
+    for row in csv.DictReader(FH, delimiter="\t"):
         fastq_files.append(row["forward_file_name"])
         fastq_files.append(row["reverse_file_name"])
     
