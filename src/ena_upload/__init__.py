@@ -67,10 +67,10 @@ def upload_fastq_files(args):
         fastq_files.append(ws.cell(row=i, column=11).value)
         i += 1
 
-    # url = "webin2.ebi.ac.uk"
-    # ftp = FTP(url, args.username, args.password)
-    # for fastq_file in tqdm(fastq_files):
-    #     ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
+    url = "webin2.ebi.ac.uk"
+    ftp = FTP(url, args.username, args.password)
+    for fastq_file in tqdm(fastq_files):
+        ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
 
 
     # save the first worksheet as a tsv
@@ -126,7 +126,7 @@ def get_validator_formulas():
     return formulas
 
 
-def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
+def write_template_files(samples: List[Union[SingleSample,PairedSample]], mode: str):
     config = load_config()
 
     # Create a workbook and add a worksheet.
@@ -166,15 +166,24 @@ def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
     ws1.add_data_validation(dv2)
     dv2.add(f"F5:F{len(samples)+4}")
 
-    
-    # Runs sheet
-    wb.active = ws2
-    ws2.append(["FileType","fastq","Read submission file type"])
-    ws2.append(["sample","study","instrument_model","library_name","library_source","library_selection","library_strategy","library_layout","forward_file_name","forward_file_md5","reverse_file_name","reverse_file_md5"])
+    if mode == 'paired':
+        # Runs sheet
+        wb.active = ws2
+        ws2.append(["FileType","fastq","Read submission file type"])
+        ws2.append(["sample","study","instrument_model","library_name","library_source","library_selection","library_strategy","library_layout","forward_file_name","forward_file_md5","reverse_file_name","reverse_file_md5"])
 
-    for sample in samples:
-        ws2.append([sample.prefix,'','',sample.prefix,'','','','PAIRED',os.path.split(sample.r1[0])[-1],sample.md5r1[0],os.path.split(sample.r2[0])[-1],sample.md5r2[0]])
+        for sample in samples:
+            ws2.append([sample.prefix,'','',sample.prefix,'','','','PAIRED',os.path.split(sample.r1[0])[-1],sample.md5r1[0],os.path.split(sample.r2[0])[-1],sample.md5r2[0]])
     
+    else:
+        # Runs sheet
+        wb.active = ws2
+        ws2.append(["FileType","fastq","Read submission file type"])
+        ws2.append(["sample","study","instrument_model","library_name","library_source","library_selection","library_strategy","library_layout","file_name","file_md5"])
+
+        for sample in samples:
+            ws2.append([sample.prefix,'','',sample.prefix,'','','','SINGLE',os.path.split(sample.r1[0])[-1],sample.md5r1[0]])
+            
     dv3 = DataValidation(type="list", formula1=validator_formulas['instrument_model'], allow_blank=False, showErrorMessage=True)
     dv3.error ='Your entry is not in the list'
     dv3.errorTitle = 'Invalid Entry'

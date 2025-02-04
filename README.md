@@ -32,6 +32,9 @@ options:
 ```
 
 ### Template help
+
+This step will find fastq files and create a template file that can be filled in with the required metadata.
+
 ```bash
 usage: ena-upload template [-h] -1 REGEX1 [-2 REGEX2] {single,paired}
 
@@ -47,6 +50,10 @@ options:
 ```
 
 ### Upload help
+
+This step will upload the fastq files to the ENA and split the template file into two files, one for the samples 
+and one for the runs. The files will be can then be manually uploaded to the ENA and the submission will be created.
+
 ```bash
 usage: ena-upload upload [-h] template username password
 
