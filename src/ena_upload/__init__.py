@@ -29,6 +29,13 @@ def cli():
     parser.add_argument('--version', action='version', version='%(prog)s '+__version__)
     subparsers = parser.add_subparsers(help='sub-command help')
 
+    # create the parser for the "discover" command
+    parser_discover = subparsers.add_parser('template', help='Discover fastq files and create a template file')
+    parser_discover.add_argument('mode', choices=['single','paired'], help='Single or paired end reads')
+    parser_discover.add_argument('-1','--regex1', help='R1 regex pattern',required=True)
+    parser_discover.add_argument('-2','--regex2', help='R2 regex pattern')
+    parser_discover.set_defaults(func=disccover_files)
+
     # create the parser for the "upload" command
     parser_upload = subparsers.add_parser('upload', help='Upload fastq files to ENA')
     parser_upload.add_argument('runs_file', help='Configuration file')
@@ -36,12 +43,6 @@ def cli():
     parser_upload.add_argument('password', help='ENA password')
     parser_upload.set_defaults(func=upload_fastq_files)
 
-    # create the parser for the "discover" command
-    parser_discover = subparsers.add_parser('discover', help='Discover fastq files')
-    parser_discover.add_argument('mode', choices=['single','paired'], help='Configuration file')
-    parser_discover.add_argument('-1','--regex1', help='R1 regex pattern',required=True)
-    parser_discover.add_argument('-2','--regex2', help='R2 regex pattern')
-    parser_discover.set_defaults(func=disccover_files)
 
     # parse the args and call whatever function was selected
     args = parser.parse_args()
