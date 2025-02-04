@@ -150,7 +150,7 @@ def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
     ws2.append(["sample","study","instrument_model","library_name","library_source","library_selection","library_strategy","library_layout","forward_file_name","forward_file_md5","reverse_file_name","reverse_file_md5"])
 
     for sample in samples:
-        ws2.append([sample.prefix,'','',sample.prefix,'','','',os.path.split(sample.r1[0])[-1],sample.md5r1[0],os.path.split(sample.r2[0])[-1],sample.md5r2[0]])
+        ws2.append([sample.prefix,'','',sample.prefix,'','','','PAIRED',os.path.split(sample.r1[0])[-1],sample.md5r1[0],os.path.split(sample.r2[0])[-1],sample.md5r2[0]])
     
     dv3 = DataValidation(type="list", formula1=validator_formulas['instrument_model'], allow_blank=False, showErrorMessage=True)
     dv3.error ='Your entry is not in the list'
@@ -175,6 +175,7 @@ def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
     dv6.errorTitle = 'Invalid Entry'
     ws2.add_data_validation(dv6)
     dv6.add(f"G3:G{len(samples)+2}")
+    
 
     
 
