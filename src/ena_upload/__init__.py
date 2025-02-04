@@ -134,7 +134,7 @@ def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
     dv1.add(f"G5:G{len(samples)+4}")
 
     # must be 4 digits
-    dv2 = DataValidation(type="whole", operator="between", formula1="1000", formula2="9999", allow_blank=False, showErrorMessage=True)
+    dv2 = DataValidation(type="list", formula1=validator_formulas['collection date'], allow_blank=False, showErrorMessage=True)
     dv2.error ='Your entry is not a year'
     dv2.errorTitle = 'Invalid Entry'
     ws1.add_data_validation(dv2)
