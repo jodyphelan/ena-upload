@@ -65,12 +65,12 @@ def upload_fastq_files(args):
             break
         fastq_files.append(ws.cell(row=i, column=9).value)
         fastq_files.append(ws.cell(row=i, column=11).value)
+        i += 1
 
-    print(fastq_files)
-    # url = "webin2.ebi.ac.uk"
-    # ftp = FTP(url, args.username, args.password)
-    # for fastq_file in tqdm(fastq_files):
-    #     ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
+    url = "webin2.ebi.ac.uk"
+    ftp = FTP(url, args.username, args.password)
+    for fastq_file in tqdm(fastq_files):
+        ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
 
 
 def disccover_files(args):
