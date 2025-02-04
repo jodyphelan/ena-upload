@@ -100,7 +100,7 @@ def get_validator_formulas():
     return formulas
 
 
-def write_template_files(samples: List[Union[SingleSample|PairedSample]]):
+def write_template_files(samples: List[Union[SingleSample,PairedSample]]):
     config = load_config()
 
     # Create a workbook and add a worksheet.
