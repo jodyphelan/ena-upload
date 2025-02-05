@@ -35,11 +35,25 @@ options:
 
 This step will find fastq files and create a template file that can be filled in with the required metadata.
 
+You can do this either by providing a regex pattern for the R1 and R2 files or by providing a list of files. 
+
 ```bash
-usage: ena-upload template [-h] -1 REGEX1 [-2 REGEX2] {single,paired}
+usage: ena-upload template [-h] {regex,file} ...
 
 positional arguments:
-  {single,paired}       Single or paired end reads
+  {regex,file}  sub-command help
+    regex       Use regex to find single end fastq files
+    file        Use a file to find fastq files
+
+options:
+  -h, --help    show this help message and exit
+```
+#### Template Regex help
+
+This step will find fastq files using a regex pattern and create a template file that can be filled in with the required metadata.
+
+```bash
+usage: ena-upload template regex [-h] -1 REGEX1 [-2 REGEX2]
 
 options:
   -h, --help            show this help message and exit
@@ -47,6 +61,21 @@ options:
                         R1 regex pattern
   -2 REGEX2, --regex2 REGEX2
                         R2 regex pattern
+```
+
+#### Template File help
+
+This step will find fastq files using a list of files and create a template file that can be filled in with the required metadata.
+The file should be a TSV file with required columns `ID` and `R1`, and optional column `R2`.
+
+```bash
+usage: ena-upload template file [-h] file
+
+positional arguments:
+  file        TSV file with required columns `ID` and `R1`, and optional column `R2`
+
+options:
+  -h, --help  show this help message and exit
 ```
 
 ### Upload help
@@ -64,3 +93,4 @@ positional arguments:
 
 options:
   -h, --help  show this help message and exit
+```
