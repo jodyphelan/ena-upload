@@ -16,7 +16,7 @@ pip install git+https://github.com/jodyphelan/ena-upload.git
 ## Usage
 
 Uploading files to the ENA requires a Webin account. You can create an account [here](https://www.ebi.ac.uk/ena/submit/sra/#home).
-1. Create a project to obtain a project accession (should start with PRJE).
+1. Create a project to obtain a project accession (should start with 'PRJE').
 2. Create a template file that can be populated in with the required metadata using the `ena-upload template` subcommand.
 3. Populate the template file with the required metadata (including the project accession) and save it.
 4. Upload the files to the ENA using the `ena-upload upload` subcommand. This will split the template file into two files, one for the samples and one for the runs. 
