@@ -30,12 +30,22 @@ def cli():
     parser.add_argument('--version', action='version', version='%(prog)s '+__version__)
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    # create the parser for the "discover" command
-    parser_discover = subparsers.add_parser('template', help='Discover fastq files and create a template file')
-    parser_discover.add_argument('mode', choices=['single','paired'], help='Single or paired end reads')
-    parser_discover.add_argument('-1','--regex1', help='R1 regex pattern',required=True)
-    parser_discover.add_argument('-2','--regex2', help='R2 regex pattern')
-    parser_discover.set_defaults(func=disccover_files)
+    # create the parser for the "template" command
+    parser_template = subparsers.add_parser('template', help='Create a template file')
+
+    # create the subparser for the "template" command
+    parser_template_subparsers = parser_template.add_subparsers(help='sub-command help')
+
+    # create the parser for the "template regex" command
+    parser_template_regex = parser_template_subparsers.add_parser('regex', help='Use regex to find single end fastq files')
+    parser_template_regex.add_argument('-1','--regex1', help='R1 regex pattern',required=True)
+    parser_template_regex.add_argument('-2','--regex2', help='R2 regex pattern')
+    parser_template_regex.set_defaults(func=regex_find_files)
+
+    # create the parser for the "template file" command
+    parser_template_file = parser_template_subparsers.add_parser('file', help='Use a file to find fastq files')
+    parser_template_file.add_argument('file', help='TSV file with required columns `ID` and `R1`, and optional column `R2`')
+    parser_template_file.set_defaults(func=parse_fof)
 
     # create the parser for the "upload" command
     parser_upload = subparsers.add_parser('upload', help='Upload fastq files to ENA')
@@ -53,7 +63,7 @@ def cli():
         parser.print_help()
 
 
-def upload_fastq_files(args):
+def upload_fastq_files(args: argparse.Namespace):
     wb = load_workbook(args.template)
 
     fastq_files = []
@@ -90,7 +100,8 @@ def upload_fastq_files(args):
 
 
 
-def disccover_files(args):
+def regex_find_files(args: argparse.Namespace):
+    args.mode = 'single' if args.regex2 is None else 'paired'
     if args.mode.lower()=='single':
         samples = ff.find_single_fastq_samples(".",args.regex1)
     else:
@@ -104,6 +115,30 @@ def disccover_files(args):
         sys.exit(1)
 
     write_template_files(samples, args.mode)
+
+def parse_fof(args: argparse.Namespace):
+    samples = []
+    for line in csv.DictReader(open(args.file), delimiter='\t'):
+        if not os.path.isfile(line['R1']):
+            logging.error(f"File {line['R1']} does not exist")
+            sys.exit(1)
+        if 'R2' in line:
+            if not os.path.isfile(line['R2']):
+                logging.error(f"File {line['R2']} does not exist")
+                sys.exit(1)
+            samples.append(PairedSample(line['ID'],[line['R1']],[line['R2']]))
+        else:
+            samples.append(SingleSample(line['ID'],[line['R1']]))
+    
+    for sample in samples:
+        sample.calculate_md5()
+
+    if len(samples) == 0:
+        logging.error("No samples found")
+        sys.exit(1)
+
+    mode = 'single' if 'R2' not in line else 'paired'
+    write_template_files(samples, mode)
 
 def load_config():
     config_file = os.path.join(__package_dir__, "config.toml")
@@ -132,7 +167,6 @@ def get_validator_formulas():
 
 
 def write_template_files(samples: List[Union[SingleSample,PairedSample]], mode: str):
-    config = load_config()
 
     # Create a workbook and add a worksheet.
     wb = Workbook()
