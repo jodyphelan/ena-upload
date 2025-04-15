@@ -8,6 +8,9 @@ authors = [{name = "Jody Phelan", email = "jody.phelan@lshtm.ac.uk"}]
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "toml"
+]
 
 [project.scripts]
 ena-upload = "ena_upload:cli"
