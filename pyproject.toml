@@ -10,7 +10,9 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
     "toml",
-    "fastq_files"
+    "fastq_files",
+    "openpyxl",
+    "tqdm"
 ]
 
 [project.scripts]
