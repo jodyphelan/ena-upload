@@ -3,7 +3,7 @@ A library for uploading fastq data to the
 European Nucleotide Archive (ENA).
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 #! /usr/bin/env python
 import sys
@@ -81,6 +81,9 @@ def upload_fastq_files(args: argparse.Namespace):
     url = "webin2.ebi.ac.uk"
     ftp = FTP(url, args.username, args.password)
     for fastq_file in tqdm(fastq_files):
+        print(f"Uploading {fastq_file}")
+        print(fastq_file+'.uploaded')
+        print(os.path.isfile(fastq_file+'.uploaded'))
         if os.path.isfile(fastq_file+'.uploaded'):
             continue
         ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
