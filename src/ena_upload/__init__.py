@@ -80,10 +80,8 @@ def upload_fastq_files(args: argparse.Namespace):
 
     url = "webin2.ebi.ac.uk"
     ftp = FTP(url, args.username, args.password)
-    for fastq_file in fastq_files:
-        print(f"Uploading {fastq_file}")
-        print(fastq_file+'.uploaded')
-        print(os.path.isfile(fastq_file+'.uploaded'))
+    logging.info(f"Connected to {url} as {args.username}")
+    for fastq_file in tqdm(fastq_files):
         if os.path.isfile(fastq_file+'.uploaded'):
             continue
         ftp.storbinary('STOR '+fastq_file, open(fastq_file, 'rb'))
